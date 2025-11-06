@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Музыкальный плеер с фоном</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        filter: blur(5px); /* начальный блюр для фона */
+        transition: filter 0.3s, background-image 0.3s;
+    }
+
+    .content {
+        position: relative;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 20px 40px;
+        border-radius: 15px;
+    }
+
+    input, select, button {
+        padding: 10px;
+        margin: 5px;
+        font-size: 16px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    #fileLabel {
+        display: block;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+<div class="content">
+    <h1>Музыкальный плеер</h1>
+
+    <!-- Музыкальный плеер -->
+    <audio id="player" controls>
+        <source src="song1.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+    <br>
+
+    <label for="songSelect">Выберите песню:</label>
+    <select id="songSelect">
+        <option value="song1.mp3">Песня 1</option>
+        <option value="song2.mp3">Песня 2</option>
+        <option value="song3.mp3">Песня 3</option>
+    </select>
+    <br>
+
+    <label for="repeatCount">Количество повторов (0 = бесконечно):</label>
+    <input type="number" id="repeatCount" value="0" min="0">
+    <br>
+
+    <button onclick="playSong()">Играть</button>
+
+    <hr>
+
+    <!-- Загрузка фона -->
+    <label id="fileLabel">
+        Выберите фоновую картинку:
+        <input type="file" id="upload" accept="image/*">
+    </label>
+    <br>
+
+    <label>
+        <input type="checkbox" id="toggleBlur"> Убрать блюр с фона
+    </label>
+</div>
+
+<script>
+    // Музыкальный плеер
+    const player = document.getElementById('player');
+    const songSelect = document.getElementById('songSelect');
+    const repeatInput = document.getElementById('repeatCount');
+
+    let repeatTimes = 0;
+    let currentRepeat = 0;
+
+    function playSong() {
+        const song = songSelect.value;
+        repeatTimes = parseInt(repeatInput.value);
+        currentRepeat = 0;
+
+        player.src = song;
+        player.play();
+    }
+
+    player.addEventListener('ended', () => {
+        currentRepeat++;
+        if (repeatTimes === 0 || currentRepeat < repeatTimes) {
+            player.currentTime = 0;
+            player.play();
+        }
+    });
+
+    // Фоновая картинка
+    const upload = document.getElementById('upload');
+    const toggleBlur = document.getElementById('toggleBlur');
+
+    upload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            document.body.style.backgroundImage = `url(${event.target.result})`;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    toggleBlur.addEventListener('change', () => {
+        if (toggleBlur.checked) {
+            document.body.style.filter = 'none';
+        } else {
+            document.body.style.filter = 'blur(5px)';
+        }
+    });
+</script>
+
+</body>
+</html>
